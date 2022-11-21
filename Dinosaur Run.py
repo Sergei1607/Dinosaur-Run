@@ -4,7 +4,7 @@
 
 import pygame
 from sys import exit
-from random import randint, choice
+from random import randint
 
 
 # =============================================================================
@@ -47,6 +47,7 @@ class Dinosaur(pygame.sprite.Sprite):
         
         self.image = self.walking_frames_list[self.walking_frame_index]
         self.rect = self.image.get_rect(midbottom = (160,610))
+        self.mask = pygame.mask.from_surface(self.image)
         
         # variables
         
@@ -109,6 +110,7 @@ class Enemy(pygame.sprite.Sprite):
         
         self.image = self.walking_frames_list[self.walking_frame_index]
         self.rect = self.image.get_rect(midbottom = (randint(1000,1200),620))
+        self.mask = pygame.mask.from_surface(self.image)
         
         
     def animate_enemy(self):     
@@ -151,10 +153,11 @@ def animate_dead():
 def collision_sprite():
     lives = game_lives
     if pygame.sprite.spritecollide(dinosaur.sprite,enemy_group,False):
+        if pygame.sprite.spritecollide(dinosaur.sprite,enemy_group,True, pygame.sprite.collide_mask):
         # delete all the obstacles if there is a collide.
-        hit_sound.play()
-        enemy_group.sprites()[0].kill()
-        lives -= 1
+            hit_sound.play()
+            #enemy_group.sprites()[0].kill()
+            lives -= 1
     lives_surf = test_font.render(f'Lives: {lives}',False,(64,64,64))
     lives_rect = lives_surf.get_rect(center = (100,50))
     screen.blit(lives_surf,lives_rect)
@@ -347,10 +350,6 @@ while True:
             enemy_group.empty()
             game_state = False
             game_lives = 3
-        
-        
-        
-        
     else:
         
         if score == 0:
